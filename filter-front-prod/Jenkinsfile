@@ -50,13 +50,13 @@ pipeline {
                 failOnError: true,
                 publishers: [
                 sshPublisherDesc(
-                    configName: "un",
+                    configName: "filter",
                     verbose: true,
                     transfers: [
 
                         sshTransfer(sourceFiles: "dist/*tar.gz", remoteDirectory: "."),
-                        sshTransfer(execCommand: "sudo tar -xzvf /usr/local/serverweb/tmp/dist/*.tar.gz -C /usr/local/serverweb/frontend/  "),
-                        sshTransfer(execCommand: "sudo mv  /usr/local/serverweb/tmp/dist/*.tar.gz  /usr/local/serverweb/bak/ ")
+                        sshTransfer(execCommand: "sudo tar -xzvf /usr/local/serverweb/temp/dist/*.tar.gz -C /usr/local/serverweb/f-tmp  "),
+                        sshTransfer(execCommand: "sudo mv  /usr/local/serverweb/temp/dist/*.tar.gz  /usr/local/serverweb/bak/ ")
 
                 ]
               )
