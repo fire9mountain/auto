@@ -1,0 +1,61 @@
+pipeline {
+    agent any
+    environment { 
+        GITLAB_URL = 'http://34.124.168.200:25002/filter_center/filter-center-backend.git'
+        BRANCH = 'master'
+        JAVA_HOME = tool name: 'jdk1.8.0_421', type: 'hudson.model.JDK'
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: env.BRANCH ,credentialsId: 'f68f24f7-163d-4780-8da6-eb5a80d45375', url: env.GITLAB_URL
+                echo 'Pull Code OK!'
+            }
+        }
+        
+        
+        stage('Compiling') {
+            steps {
+                withEnv(["JAVA_HOME=${tool name: 'jdk1.8.0_421', type: 'hudson.model.JDK'}", "PATH+EXTRA=${JAVA_HOME}/bin"]) {
+                    sh 'echo $PATH'
+                    sh 'java -version'
+                    sh 'mvn -version'
+                    sh 'mvn clean install -DskipTests -Pprod'
+                }
+            }
+        }
+        stage('Check Build Artifacts') {
+            steps {
+                sh 'ls -l ./jeecg-module-system/jeecg-system-start/target/'
+                sh 'rm -f ./filter-center-service.jar '
+                sh 'cp -a ./jeecg-module-system/jeecg-system-start/target/filter-center-service.jar ./'
+            }
+        }
+        
+        
+        stage ("Deploy"){
+            steps {
+            echo 'Transfer Files'
+            sshPublisher(
+                continueOnError: false,
+                failOnError: true,
+                publishers: [
+                sshPublisherDesc(
+                    configName: "un",
+                    verbose: true,
+                    transfers: [
+                      sshTransfer(execCommand: "sudo mv /usr/local/serverweb/backend/filter-center-service.jar /usr/local/serverweb/backend/bak/`date '+%Y-%m-%d-%H-%M'`-filter-center-service.jar  "),
+                      sshTransfer(sourceFiles: "filter-center-service.jar", remoteDirectory: "."),
+                      sshTransfer(execCommand:"sudo sleep 3 "),
+                      sshTransfer(execCommand:"sudo cp -a /usr/local/serverweb/backend/tmp/filter-center-service.jar /usr/local/serverweb/backend/ "),
+                      sshTransfer(execCommand:"sudo /usr/local/serverweb/backend/start.sh")
+                ]
+              )
+            ]
+          )
+            }
+        }
+        
+    }
+    
+}
