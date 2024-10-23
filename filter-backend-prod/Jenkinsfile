@@ -41,14 +41,14 @@ pipeline {
                 failOnError: true,
                 publishers: [
                 sshPublisherDesc(
-                    configName: "un",
+                    configName: "filter",
                     verbose: true,
                     transfers: [
-                      sshTransfer(execCommand: "sudo mv /usr/local/serverweb/backend/filter-center-service.jar /usr/local/serverweb/backend/bak/`date '+%Y-%m-%d-%H-%M'`-filter-center-service.jar  "),
+//                      sshTransfer(execCommand: "sudo mv /usr/local/serverweb/backend/filter-center-service.jar /usr/local/serverweb/bak/`date '+%Y-%m-%d-%H-%M'`-filter-center-service.jar  "),
                       sshTransfer(sourceFiles: "filter-center-service.jar", remoteDirectory: "."),
-                      sshTransfer(execCommand:"sudo sleep 3 "),
-                      sshTransfer(execCommand:"sudo cp -a /usr/local/serverweb/backend/tmp/filter-center-service.jar /usr/local/serverweb/backend/ "),
-                      sshTransfer(execCommand:"sudo /usr/local/serverweb/backend/start.sh")
+                      sshTransfer(execCommand:"sudo sleep 3 ")
+//                      sshTransfer(execCommand:"sudo cp -a /usr/local/serverweb/temp/filter-center-service.jar /usr/local/serverweb/backend/ "),
+//                      sshTransfer(execCommand:"sudo /usr/local/serverweb/backend/start.sh")
                 ]
               )
             ]
