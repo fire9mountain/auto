@@ -54,9 +54,9 @@ pipeline {
                     transfers: [
 
                         sshTransfer(sourceFiles: "dist/*tar.gz", remoteDirectory: ".")
-//                        sshTransfer(execCommand: "sudo tar -xzvf /usr/local/JaveWeb/customer-tools/customer-tools/temp/dist/*.tar.gz -C /usr/local/JaveWeb/customer-tools/customer-tools/f-tmp/ "),
-//                        sshTransfer(execCommand: "sudo sleep 3"),
-//                        sshTransfer(execCommand: "sudo mv /usr/local/JaveWeb/customer-tools/customer-tools/temp/dist/*.tar.gz  /usr/local/JaveWeb/customer-tools/customer-tools/bak/ ")
+                        sshTransfer(execCommand: "sudo tar -xzvf /usr/local/JaveWeb/customer-tools/customer-tools/temp/dist/*.tar.gz -C /usr/local/JaveWeb/customer-tools/customer-tools/f-tmp/ "),
+                        sshTransfer(execCommand: "sudo sleep 3"),
+                        sshTransfer(execCommand: "sudo mv /usr/local/JaveWeb/customer-tools/customer-tools/temp/dist/*.tar.gz  /usr/local/JaveWeb/customer-tools/customer-tools/bak/ ")
 
                 ]
               )
