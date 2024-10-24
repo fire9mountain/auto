@@ -45,11 +45,11 @@ pipeline {
                     configName: "customertoolprod",
                     verbose: true,
                     transfers: [
-//                      sshTransfer(execCommand: "sudo mv /usr/local/customer-tools/backend/customer-serve-tools.jar /usr/local/customer-tools/bak/`date '+%Y-%m-%d-%H-%M'`-customer-serve-tools.jar  "),
+                      sshTransfer(execCommand: "sudo mv /usr/local/JaveWeb/customer-tools/customer-tools/backend/customer-serve-tools.jar  /usr/local/JaveWeb/customer-tools/customer-tools/bak/`date '+%Y-%m-%d-%H-%M'`-customer-serve-tools.jar  "),
                       sshTransfer(sourceFiles: "customer-serve-tools.jar", remoteDirectory: "."),
-                      sshTransfer(execCommand:"sudo sleep 3 ")
-//                      sshTransfer(execCommand:"sudo cp -a /usr/local/customer-tools/temp/customer-serve-tools.jar /usr/local/customer-tools/backend/ "),
-//                      sshTransfer(execCommand:"sudo /usr/local/customer-tools/backend/start.sh")
+                      sshTransfer(execCommand:"sudo sleep 3 "),
+                      sshTransfer(execCommand:"sudo cp -a /usr/local/JaveWeb/customer-tools/customer-tools/temp/customer-serve-tools.jar /usr/local/JaveWeb/customer-tools/customer-tools/backend/ "),
+                      sshTransfer(execCommand:"sudo /usr/local/JaveWeb/customer-tools/customer-tools/backend/start.sh")
                 ]
               )
             ]
