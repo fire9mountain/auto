@@ -1,0 +1,62 @@
+pipeline {
+    agent any
+    environment { 
+        GITLAB_URL = 'http://34.124.168.200:25002/Customer_Service_Tools/customer-serve-tools-backend.git'
+        BRANCH = 'feature/test'
+        JAVA_HOME = tool name: 'jdk1.8.0_421', type: 'hudson.model.JDK'
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: env.BRANCH ,credentialsId: 'f68f24f7-163d-4780-8da6-eb5a80d45375', url: env.GITLAB_URL
+                echo 'Pull Code OK!'
+            }
+        }
+        
+        
+        stage('Compiling') {
+            steps {
+                withEnv(["JAVA_HOME=${tool name: 'jdk1.8.0_421', type: 'hudson.model.JDK'}", "PATH+EXTRA=${JAVA_HOME}/bin"]) {
+                    sh 'echo $PATH'
+                    sh 'java -version'
+                    sh 'mvn -version'
+                    sh 'mvn clean install -DskipTests -Ptest'
+                }
+            }
+        }
+        stage('Check Build Artifacts') {
+            steps {
+                sh 'echo "hello" '
+                sh 'ls -l ./jeecg-module-system/jeecg-system-start/target/'
+                sh 'rm -f ./customer-serve-tools.jar '
+                sh 'cp -a ./jeecg-module-system/jeecg-system-start/target/customer-serve-tools.jar  ./'
+            }
+        }
+        
+        
+        stage ("Deploy"){
+            steps {
+            echo 'Transfer Files'
+            sshPublisher(
+                continueOnError: false,
+                failOnError: true,
+                publishers: [
+                sshPublisherDesc(
+                    configName: "customertool",
+                    verbose: true,
+                    transfers: [
+                      sshTransfer(execCommand: "sudo mv /usr/local/customer-tools/backend/customer-serve-tools.jar /usr/local/customer-tools/bak/`date '+%Y-%m-%d-%H-%M'`-customer-serve-tools.jar  "),
+                      sshTransfer(sourceFiles: "customer-serve-tools.jar", remoteDirectory: "."),
+                      sshTransfer(execCommand:"sudo sleep 3 "),
+                      sshTransfer(execCommand:"sudo cp -a /usr/local/customer-tools/temp/customer-serve-tools.jar /usr/local/customer-tools/backend/ "),
+                      sshTransfer(execCommand:"sudo /usr/local/customer-tools/backend/start.sh")
+                ]
+              )
+            ]
+          )
+            }
+        }
+        
+    }
+    
+}

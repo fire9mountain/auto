@@ -1,0 +1,93 @@
+pipeline {
+  agent any
+
+  environment {
+          BUILD_TIME = sh(script: "echo `date +%Y%m%d%H%M`", returnStdout: true).trim()
+   }
+
+  stages {
+    stage('Init') {
+      steps {
+        echo 'Init Tourism project..'
+        sh 'node -v'
+        sh 'npm -v'
+      }
+    }
+    stage('Git Checkout'){
+        steps{
+            sh 'git --version'
+//            git credentialsId: 'f68f24f7-163d-4780-8da6-eb5a80d45375', url: 'http://34.124.168.200:25002/Customer_Service_Tools/customer-serve-tools-frontend.git'
+//            git branch: env.BRANCH ,credentialsId: 'f68f24f7-163d-4780-8da6-eb5a80d45375', url: env.GITLAB_URL
+            git branch: 'master', credentialsId: 'f68f24f7-163d-4780-8da6-eb5a80d45375', url: 'http://34.124.168.200:25002/Customer_Service_Tools/customer-serve-tools-frontend.git'
+            echo 'Pull Code OK!'
+        }
+    }
+
+    stage('npm Build') {
+      steps {
+        echo 'npm install...'
+        sh  "npm install --force "
+        echo 'Building..'
+        sh "npm run build:test"
+
+      }
+    }
+  
+  
+         stage('Check Build Artifacts') {
+            steps {
+                sh ' cd dist && pwd && sudo tar -czvf dist-$(date +%Y%m%d%H%M).tar.gz  ./*'
+                sh 'cd dist && ls |grep *.tar.gz'
+            }
+        }
+        
+            stage ("Deploy"){
+            steps {
+            echo 'Transfer Files'
+            sshPublisher(
+                continueOnError: false,
+                failOnError: true,
+                publishers: [
+                sshPublisherDesc(
+                    configName: "customertoolprod",
+                    verbose: true,
+                    transfers: [
+
+                        sshTransfer(sourceFiles: "dist/*tar.gz", remoteDirectory: ".")
+//                        sshTransfer(execCommand: "sudo tar -xzvf /usr/local/JaveWeb/customer-tools/customer-tools/temp/dist/*.tar.gz -C /usr/local/JaveWeb/customer-tools/customer-tools/f-tmp/ "),
+//                        sshTransfer(execCommand: "sudo sleep 3"),
+//                        sshTransfer(execCommand: "sudo mv /usr/local/JaveWeb/customer-tools/customer-tools/temp/dist/*.tar.gz  /usr/local/JaveWeb/customer-tools/customer-tools/bak/ ")
+
+                ]
+              )
+            ]
+          )
+            }
+        }
+  
+  }
+  post {
+      failure {
+          script {
+              echo 'failure'
+          }
+      }
+      success{
+          script{
+              env.IMAGE_NUM = sh(
+              script: 'sudo docker images | grep -w "${REPO_DOMAIN}/${DOCKER_NAME}" | grep ${DOCKER_TAG} | awk \'{print $3}\'|wc -l',
+              returnStdout: true
+              ).trim()
+              }
+              sh '''
+
+              if [ $IMAGE_NUM != 0 ]
+                then
+                  for i in `sudo docker images | grep -w "${REPO_DOMAIN}/${DOCKER_NAME}" | grep ${DOCKER_TAG} | awk '{print $3}'`;do sudo docker rmi $i;done
+                else
+                  echo "No images can be delete!!"
+              fi
+              '''
+      }
+  }
+}
