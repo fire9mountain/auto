@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment { 
         GITLAB_URL = 'http://34.124.168.200:25002/Customer_Service_Tools/customer-serve-tools-backend.git'
-        BRANCH = 'feature/test'
+        BRANCH = 'master'
         JAVA_HOME = tool name: 'jdk1.8.0_421', type: 'hudson.model.JDK'
     }
     stages {
@@ -20,7 +20,7 @@ pipeline {
                     sh 'echo $PATH'
                     sh 'java -version'
                     sh 'mvn -version'
-                    sh 'mvn clean install -DskipTests -Ptest'
+                    sh 'mvn clean install -DskipTests -Pprod'
                 }
             }
         }
@@ -42,14 +42,14 @@ pipeline {
                 failOnError: true,
                 publishers: [
                 sshPublisherDesc(
-                    configName: "customertool",
+                    configName: "customertoolprod",
                     verbose: true,
                     transfers: [
-                      sshTransfer(execCommand: "sudo mv /usr/local/customer-tools/backend/customer-serve-tools.jar /usr/local/customer-tools/bak/`date '+%Y-%m-%d-%H-%M'`-customer-serve-tools.jar  "),
+//                      sshTransfer(execCommand: "sudo mv /usr/local/customer-tools/backend/customer-serve-tools.jar /usr/local/customer-tools/bak/`date '+%Y-%m-%d-%H-%M'`-customer-serve-tools.jar  "),
                       sshTransfer(sourceFiles: "customer-serve-tools.jar", remoteDirectory: "."),
-                      sshTransfer(execCommand:"sudo sleep 3 "),
-                      sshTransfer(execCommand:"sudo cp -a /usr/local/customer-tools/temp/customer-serve-tools.jar /usr/local/customer-tools/backend/ "),
-                      sshTransfer(execCommand:"sudo /usr/local/customer-tools/backend/start.sh")
+                      sshTransfer(execCommand:"sudo sleep 3 ")
+//                      sshTransfer(execCommand:"sudo cp -a /usr/local/customer-tools/temp/customer-serve-tools.jar /usr/local/customer-tools/backend/ "),
+//                      sshTransfer(execCommand:"sudo /usr/local/customer-tools/backend/start.sh")
                 ]
               )
             ]
