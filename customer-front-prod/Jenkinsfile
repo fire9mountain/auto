@@ -28,7 +28,7 @@ pipeline {
         echo 'npm install...'
         sh  "npm install --force "
         echo 'Building..'
-        sh "npm run build:test"
+        sh "npm run build"
 
       }
     }
