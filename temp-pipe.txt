@@ -1,0 +1,41 @@
+pipeline {
+    agent any
+    options {
+        //丢弃旧的构建，保持构建的最大个数为10
+        buildDiscarder logRotator(numToKeepStr: '10')
+        //禁止流水线的并发执行，有助于防止共享资源被同时访问
+        disableConcurrentBuilds()
+        //设置流水线超时时间
+        timeout(time: 1, unit: 'HOURS')
+    }
+    parameters {
+        string(name: 'PERSON', defaultValue: 'Mr Jenkins', description: 'Who should I say hello to?')
+
+        text(name: 'BIOGRAPHY', defaultValue: '', description: 'Enter some information about the person')
+
+        booleanParam(name: 'TOGGLE', defaultValue: true, description: 'Toggle this value')
+
+        choice(name: 'CHOICE', choices: ['One', 'Two', 'Three'], description: 'Pick something')
+
+        password(name: 'PASSWORD', defaultValue: 'SECRET', description: 'Enter a password')
+
+        extendedChoice(defaultValue: 'One,Two,Three', value: 'One,Two,Three', description: '', multiSelectDelimiter: ',', name: 'EXTENDEDCHOICE', quoteValue: false, type: 'PT_CHECKBOX', visibleItemCount: 15)
+    }
+    stages {
+        stage('Example') {
+            steps {
+                echo "Hello ${params.PERSON}"
+
+                echo "Biography: ${params.BIOGRAPHY}"
+
+                echo "Toggle: ${params.TOGGLE}"
+
+                echo "Choice: ${params.CHOICE}"
+
+                echo "Password: ${params.PASSWORD}"
+
+                echo "ExtendedChoice: ${params.EXTENDEDCHOICE}"
+            }
+        }
+    }
+}

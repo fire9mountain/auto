@@ -1,0 +1,58 @@
+pipeline {
+    agent any
+    environment {
+        ProjectEnv = "生产环境"
+        ProjectMain = "WS-V2"
+        ACTION = "${UPDATE_OR_ADD_DELETE}"
+    }
+     tools {
+        // 定义 JDK 工具 在全局配置里面配置保持一致
+        jdk 'JDK1.8'
+    }
+    stages{
+        stage('define paramater'){
+            steps{
+                script{
+                    BRANCH  = "master"
+                }
+            }
+        }
+    	stage('check out') {
+    	    steps{
+            git branch:  "${BRANCH}",  credentialsId: 'f68f24f7-163d-4780-8da6-eb5a80d45375', url: 'http://34.124.168.200:25002/tg-super-cloud-control1/tg-cloud-api.git'
+    	    }
+	    }
+	    stage('complie with JDK1.8.0_72') {
+	         steps {
+               script {
+                     sh "/app/maven/bin/mvn  -U clean  package"
+                 }
+            }
+	    }
+	     stage('extend or delete') {
+	         when {
+                anyOf {
+                    equals expected: 'ADD',actual: ACTION
+                    equals expected: 'DELETE',actual: ACTION
+                    }
+            }
+	        steps{
+	             script{
+                   // 参数说明:第一个是当前运行的Jenkins名称,第二个是ansible的发布服务器名称,第三个是静态资源名称位置,第四个是判断执行发布还是回滚 
+                   // sh  "/sdb146/jenkins-shell/mirco-service/common/build_yaml_jar_common_v1.sh ${env.JOB_NAME} ${BRANCH} WS-V2"
+				   sh "/app/jenkins_script/deploy_v2.sh ${env.JOB_NAME} ${BRANCH} WS-V2  ${ACTION} ${OPS_HOSTS}"
+    	        }
+	        }
+        }  
+	    stage('deploy online all normarly') {
+	        when {equals expected: 'UPDATE',actual: ACTION }
+	        steps{
+	             script{
+                   // 参数说明:第一个是当前运行的Jenkins名称,第二个是ansible的发布服务器名称,第三个是静态资源名称位置,第四个是判断执行发布还是回滚 
+                   // sh  "/sdb146/jenkins-shell/mirco-service/common/build_yaml_jar_common_v1.sh ${env.JOB_NAME} ${BRANCH} WS-V2"
+				   sh "/app/jenkins_script/deploy_v2.sh ${env.JOB_NAME} ${BRANCH} WS-V2 ${ACTION}"
+    	        }
+	        }
+        }  
+    }
+}
