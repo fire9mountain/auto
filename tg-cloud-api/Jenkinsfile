@@ -26,7 +26,9 @@ pipeline {
 	    stage('complie with JDK1.8') {
 	         steps {
                script {
-                     sh "/app/maven/bin/mvn  -U clean  package"
+                     sh 'java -version'
+                     sh 'mvn -version'
+                     sh "mvn  -U clean  package"
                  }
             }
 	    }
