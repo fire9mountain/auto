@@ -3,11 +3,12 @@ pipeline {
     environment {
         ProjectEnv = "生产环境"
         ProjectMain = "WS-V2"
+        JAVA_HOME = tool name: 'jdk1.8.0_421', type: 'hudson.model.JDK'
         ACTION = "${UPDATE_OR_ADD_DELETE}"
     }
      tools {
         // 定义 JDK 工具 在全局配置里面配置保持一致
-        jdk 'JDK1.8'
+        jdk 'jdk1.8.0_421'
     }
     stages{
         stage('define paramater'){
@@ -22,7 +23,7 @@ pipeline {
             git branch:  "${BRANCH}",  credentialsId: 'f68f24f7-163d-4780-8da6-eb5a80d45375', url: 'http://34.124.168.200:25002/tg-super-cloud-control1/tg-cloud-api.git'
     	    }
 	    }
-	    stage('complie with JDK1.8.0_72') {
+	    stage('complie with JDK1.8') {
 	         steps {
                script {
                      sh "/app/maven/bin/mvn  -U clean  package"
