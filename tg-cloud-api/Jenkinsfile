@@ -43,7 +43,7 @@ pipeline {
 	             script{
                    // 参数说明:第一个是当前运行的Jenkins名称,第二个是ansible的发布服务器名称,第三个是静态资源名称位置,第四个是判断执行发布还是回滚 
                    // sh  "/sdb146/jenkins-shell/mirco-service/common/build_yaml_jar_common_v1.sh ${env.JOB_NAME} ${BRANCH} WS-V2"
-				   sh "/app/jenkins_script/deploy_tg.sh ${env.JOB_NAME} ${BRANCH} WS-V2  ${ACTION} ${OPS_HOSTS}"
+				   sh "/data/jenkins_shell/deploy_tg.sh ${env.JOB_NAME} ${BRANCH} WS-V2  ${ACTION} ${OPS_HOSTS}"
     	        }
 	        }
         }  
@@ -53,7 +53,7 @@ pipeline {
 	             script{
                    // 参数说明:第一个是当前运行的Jenkins名称,第二个是ansible的发布服务器名称,第三个是静态资源名称位置,第四个是判断执行发布还是回滚 
                    // sh  "/sdb146/jenkins-shell/mirco-service/common/build_yaml_jar_common_v1.sh ${env.JOB_NAME} ${BRANCH} WS-V2"
-				   sh "/app/jenkins_script/deploy_tg.sh ${env.JOB_NAME} ${BRANCH} WS-V2 ${ACTION}"
+				   sh "/data/jenkins_shell/deploy_tg.sh ${env.JOB_NAME} ${BRANCH} WS-V2 ${ACTION}"
     	        }
 	        }
         }  
