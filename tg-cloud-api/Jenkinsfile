@@ -14,7 +14,7 @@ pipeline {
         stage('define paramater'){
             steps{
                 script{
-                    BRANCH  = "master"
+                    BRANCH  = "${BRANCH}"
                 }
             }
         }
